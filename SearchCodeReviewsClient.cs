@@ -45,7 +45,11 @@ public class SearchCodeReviewsClient
             },
         };
 
-        var results = await searchClient.SearchAsync<string>(code, options).ConfigureAwait(false);
-        return string.Join("\n\n", results.Value.GetResults().Select(r => r.Document.ToString()));
+        var results = await searchClient.SearchAsync<SearchDocument>(code, options).ConfigureAwait(false);
+        return string.Join("\n\n", results.Value.GetResults().Select(r =>
+        {
+            var doc = r.Document;
+            return doc.TryGetValue("review", out var review) ? review.ToString() : string.Empty;
+        }));
     }
 }
